@@ -81,7 +81,7 @@ def install_immutability_triggers() -> None:
 
 def init_db() -> None:
     """Create all tables and install DB-level protections. Idempotent."""
-    from . import models  # noqa: F401  (register mappers)
+    from . import models  # noqa: F401  (side-effect import registers SQLAlchemy mappers)
 
     Base.metadata.create_all(bind=engine)
     install_immutability_triggers()

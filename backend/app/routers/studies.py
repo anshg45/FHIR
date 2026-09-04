@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..deps import AuditContext, audit_ctx, deny_read_only, get_scoped_study, get_study_or_404
+from ..deps import AuditContext, audit_ctx, get_scoped_study, get_study_or_404
 from ..models import (
     AdverseEvent,
     DataQuery,

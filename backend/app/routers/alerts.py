@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..deps import AuditContext, audit_ctx
-from ..jobs import DEFAULT_THRESHOLDS, ensure_default_thresholds, run_all_jobs
+from ..jobs import ensure_default_thresholds, run_all_jobs
 from ..models import Alert, AlertThreshold, User
 from ..schemas import AlertOut, Paged, ThresholdOut, ThresholdUpsert
 from ..security import RequireRoles, get_current_user

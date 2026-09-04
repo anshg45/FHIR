@@ -3,7 +3,7 @@
 Supports: ResearchStudy, Patient, ResearchSubject, AdverseEvent, Encounter
          + CapabilityStatement + Bundles + OperationOutcome errors.
 """
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session

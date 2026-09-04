@@ -6,7 +6,7 @@ from typing import Any
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
-from .crypto_utils import GENESIS_HASH, canonical_json, compute_row_hash
+from .crypto_utils import GENESIS_HASH, compute_row_hash
 from .models import AuditTrail, User
 
 logger = logging.getLogger(__name__)

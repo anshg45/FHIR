@@ -95,7 +95,7 @@ def _ext_string(url: str, value: Any) -> dict:
 
 
 # ------------------------------------------------------------ ResearchStudy
-def research_study_to_fhir(s) -> dict:
+def _study_identifiers(s) -> list[dict]:
     identifiers = [
         {
             "use": "official",
@@ -121,12 +121,41 @@ def research_study_to_fhir(s) -> dict:
                 "value": s.iec_approval_number,
             }
         )
+    return identifiers
 
+
+def _study_period(s) -> dict | None:
+    if not (s.start_date or s.end_date):
+        return None
+    period = {}
+    if s.start_date:
+        period["start"] = _iso(s.start_date)
+    if s.end_date:
+        period["end"] = _iso(s.end_date)
+    return period
+
+
+def _study_extensions(s) -> list[dict]:
+    ext = [
+        _ext_string("ctms-status", s.status),
+        _ext_string("ctri-status", s.ctri_status),
+        _ext_string("iec-approval-status", s.iec_approval_status),
+        {"url": f"{EXT_BASE}/enrollment-target", "valueInteger": s.enrollment_target or 0},
+        {"url": f"{EXT_BASE}/enrolled-count", "valueInteger": s.enrolled_count or 0},
+    ]
+    if s.iec_renewal_due:
+        ext.append(
+            {"url": f"{EXT_BASE}/iec-renewal-due", "valueDate": _iso(s.iec_renewal_due)}
+        )
+    return ext
+
+
+def research_study_to_fhir(s) -> dict:
     res: dict = {
         "resourceType": "ResearchStudy",
         "id": s.id,
         "meta": _meta(s),
-        "identifier": identifiers,
+        "identifier": _study_identifiers(s),
         "title": s.title,
         "status": STUDY_STATUS_MAP.get(s.status, "in-review"),
         "primaryPurposeType": _cc(
@@ -157,27 +186,12 @@ def research_study_to_fhir(s) -> dict:
         res["site"] = [
             {"reference": f"Location/{s.site_id}", "display": getattr(s.site, "name", None)}
         ]
-    if s.start_date or s.end_date:
-        period = {}
-        if s.start_date:
-            period["start"] = _iso(s.start_date)
-        if s.end_date:
-            period["end"] = _iso(s.end_date)
+    period = _study_period(s)
+    if period:
         res["period"] = period
     if s.intervention:
         res["focus"] = [{"text": s.intervention}]
-
-    res["extension"] = [
-        _ext_string("ctms-status", s.status),
-        _ext_string("ctri-status", s.ctri_status),
-        _ext_string("iec-approval-status", s.iec_approval_status),
-        {"url": f"{EXT_BASE}/enrollment-target", "valueInteger": s.enrollment_target or 0},
-        {"url": f"{EXT_BASE}/enrolled-count", "valueInteger": s.enrolled_count or 0},
-    ]
-    if s.iec_renewal_due:
-        res["extension"].append(
-            {"url": f"{EXT_BASE}/iec-renewal-due", "valueDate": _iso(s.iec_renewal_due)}
-        )
+    res["extension"] = _study_extensions(s)
     return res
 
 
@@ -263,6 +277,51 @@ def research_subject_to_fhir(p) -> dict:
 
 
 # ------------------------------------------------------------- AdverseEvent
+def _ae_event(ae) -> dict:
+    if ae.meddra_code:
+        return {
+            "coding": [
+                {
+                    "system": "http://aiia.gov.in/fhir/CodeSystem/synthetic-meddra",
+                    "code": ae.meddra_code,
+                    "display": ae.meddra_pt or ae.ae_term,
+                }
+            ],
+            "text": ae.ae_term or ae.description,
+        }
+    return {"text": ae.ae_term or ae.description}
+
+
+def _ae_seriousness(ae) -> dict:
+    return _cc(
+        "http://terminology.hl7.org/CodeSystem/adverse-event-seriousness",
+        "serious" if ae.seriousness == "serious" else "non-serious",
+        "Serious" if ae.seriousness == "serious" else "Non-serious",
+        ae.seriousness_criteria,
+    )
+
+
+def _ae_extensions(ae) -> list[dict]:
+    ext = [
+        _ext_string("ae-workflow-status", ae.status),
+        {"url": f"{EXT_BASE}/sae-confirmed", "valueBoolean": bool(ae.sae_confirmed)},
+        {"url": f"{EXT_BASE}/ec-escalated", "valueBoolean": bool(ae.ec_escalated)},
+        {"url": f"{EXT_BASE}/dsmb-flag", "valueBoolean": bool(ae.dsmb_flag)},
+    ]
+    if ae.regulatory_deadline:
+        ext.append(
+            {
+                "url": f"{EXT_BASE}/regulatory-deadline",
+                "valueDateTime": _iso(ae.regulatory_deadline),
+            }
+        )
+    if ae.causality:
+        ext.append(_ext_string("causality-assessment", ae.causality))
+    if ae.meddra_soc:
+        ext.append(_ext_string("meddra-soc", ae.meddra_soc))
+    return ext
+
+
 def adverse_event_to_fhir(ae) -> dict:
     res: dict = {
         "resourceType": "AdverseEvent",
@@ -281,34 +340,14 @@ def adverse_event_to_fhir(ae) -> dict:
             )
         ],
         "subject": {"reference": f"Patient/{ae.patient_id}"},
+        "event": _ae_event(ae),
+        "seriousness": _ae_seriousness(ae),
     }
-
-    if ae.meddra_code:
-        res["event"] = {
-            "coding": [
-                {
-                    "system": "http://aiia.gov.in/fhir/CodeSystem/synthetic-meddra",
-                    "code": ae.meddra_code,
-                    "display": ae.meddra_pt or ae.ae_term,
-                }
-            ],
-            "text": ae.ae_term or ae.description,
-        }
-    else:
-        res["event"] = {"text": ae.ae_term or ae.description}
-
     if ae.onset_date:
         res["date"] = _iso(ae.onset_date)
         res["detected"] = _iso(ae.onset_date)
     if ae.report_date:
         res["recordedDate"] = _iso(ae.report_date)
-
-    res["seriousness"] = _cc(
-        "http://terminology.hl7.org/CodeSystem/adverse-event-seriousness",
-        "serious" if ae.seriousness == "serious" else "non-serious",
-        "Serious" if ae.seriousness == "serious" else "Non-serious",
-        ae.seriousness_criteria,
-    )
     if ae.severity:
         res["severity"] = _cc(
             "http://terminology.hl7.org/CodeSystem/adverse-event-severity",
@@ -324,29 +363,10 @@ def adverse_event_to_fhir(ae) -> dict:
         res["recorder"] = {"reference": f"Practitioner/{ae.reported_by}"}
     res["study"] = [{"reference": f"ResearchStudy/{ae.study_id}"}]
     if ae.suspect_intervention:
-        res["suspectEntity"] = [
-            {"instance": {"display": ae.suspect_intervention}}
-        ]
+        res["suspectEntity"] = [{"instance": {"display": ae.suspect_intervention}}]
     if ae.narrative:
         res["note"] = [{"text": ae.narrative}]
-
-    res["extension"] = [
-        _ext_string("ae-workflow-status", ae.status),
-        {"url": f"{EXT_BASE}/sae-confirmed", "valueBoolean": bool(ae.sae_confirmed)},
-        {"url": f"{EXT_BASE}/ec-escalated", "valueBoolean": bool(ae.ec_escalated)},
-        {"url": f"{EXT_BASE}/dsmb-flag", "valueBoolean": bool(ae.dsmb_flag)},
-    ]
-    if ae.regulatory_deadline:
-        res["extension"].append(
-            {
-                "url": f"{EXT_BASE}/regulatory-deadline",
-                "valueDateTime": _iso(ae.regulatory_deadline),
-            }
-        )
-    if ae.causality:
-        res["extension"].append(_ext_string("causality-assessment", ae.causality))
-    if ae.meddra_soc:
-        res["extension"].append(_ext_string("meddra-soc", ae.meddra_soc))
+    res["extension"] = _ae_extensions(ae)
     return res
 
 

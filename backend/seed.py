@@ -10,10 +10,13 @@ Run:  cd /app/backend && python seed.py
 from __future__ import annotations
 
 import logging
+import os
 import random
 from datetime import date, datetime, timedelta, timezone
 
+from dotenv import load_dotenv
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.audit import log_action
 from app.database import SessionLocal, init_db
@@ -37,8 +40,11 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(
 logger = logging.getLogger("seed")
 random.seed(42)
 
-
-DEMO_PASSWORD = "Aiia@2025"
+# Demo password for the 7 seeded role accounts. Sourced from the environment so
+# secrets never live in source control; falls back to a public demo default so
+# a first-time reviewer can still boot the system without extra setup.
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+DEMO_PASSWORD: str = os.environ.get("SEED_DEMO_PASSWORD", "Aiia@2025")
 
 
 USERS = [
@@ -139,7 +145,7 @@ DEVIATIONS = [
 ]
 
 
-def _upsert_site(db, name, code, city, state):
+def _upsert_site(db: Session, name: str, code: str, city: str, state: str) -> Site:
     row = db.execute(select(Site).where(Site.code == code)).scalars().first()
     if row:
         return row
@@ -151,7 +157,8 @@ def _upsert_site(db, name, code, city, state):
     return row
 
 
-def _upsert_user(db, name, email, role, designation, site_id=None):
+def _upsert_user(db: Session, name: str, email: str, role: str, designation: str,
+                 site_id: str | None = None) -> User:
     row = db.execute(select(User).where(User.email == email)).scalars().first()
     if row:
         return row
@@ -167,7 +174,8 @@ def _visit_dates(start: date, count: int, interval: int) -> list[date]:
     return [start + timedelta(days=interval * i) for i in range(count)]
 
 
-def _create_study(db, spec, site, pi, coordinator, monitor, admin):
+def _create_study(db: Session, spec: dict, site: Site, pi: User, coordinator: User,
+                  monitor: User, admin: User) -> ResearchStudy:
     existing = db.execute(
         select(ResearchStudy).where(ResearchStudy.protocol_number == spec["protocol_number"])
     ).scalars().first()
@@ -248,7 +256,8 @@ def _create_study(db, spec, site, pi, coordinator, monitor, admin):
     return study
 
 
-def _create_patients(db, study, pi, coordinator, count):
+def _create_patients(db: Session, study: ResearchStudy, pi: User,
+                     coordinator: User, count: int) -> list[Patient]:
     if study.status != "active":
         return []
     existing = db.execute(select(Patient).where(Patient.study_id == study.id)).scalars().all()
@@ -312,7 +321,7 @@ def _create_patients(db, study, pi, coordinator, count):
     return enrolled
 
 
-def _create_visits(db, study, patients):
+def _create_visits(db: Session, study: ResearchStudy, patients: list[Patient]) -> None:
     names = ["Baseline", "Week 2", "Week 4", "Week 8", "Week 12"]
     for p in patients:
         if p.enrollment_date is None:
@@ -346,7 +355,8 @@ def _create_visits(db, study, patients):
             )
 
 
-def _create_aes(db, study, patients, pv_user):
+def _create_aes(db: Session, study: ResearchStudy, patients: list[Patient],
+                pv_user: User) -> None:
     seq = 0
     for i, p in enumerate(patients):
         if p.enrollment_date is None:
@@ -400,7 +410,8 @@ def _create_aes(db, study, patients, pv_user):
             db.add(ae)
 
 
-def _create_deviations(db, study, patients, coordinator):
+def _create_deviations(db: Session, study: ResearchStudy, patients: list[Patient],
+                       coordinator: User) -> None:
     if not patients:
         return
     for j in range(min(3, len(patients))):
@@ -421,7 +432,8 @@ def _create_deviations(db, study, patients, coordinator):
         )
 
 
-def _write_creation_audit(db, admin, entity_type, entity_id, snapshot, reason):
+def _write_creation_audit(db: Session, admin: User, entity_type: str,
+                          entity_id: str, snapshot: dict, reason: str) -> None:
     log_action(
         db, action="SEED_CREATE", entity_type=entity_type,
         entity_id=str(entity_id), user=admin,
