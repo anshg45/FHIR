@@ -1,0 +1,58 @@
+[
+  {
+    "content": "Phase 0: PostgreSQL 15 installed, /app/pgdata, supervisor-managed, aiia_ctms DB created",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 0: Install backend deps",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: POC - schema + audit hash-chain + PG immutability triggers",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: POC - Merkle batching + pluggable anchor + /audit/verify tamper detection",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: POC - JWT RBAC + CTRI enrollment hard gate + FHIR R4 valid JSON",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: poc_test.py fully green (69/69 checks)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2: Full DB schema (all tables) + models",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2: Pydantic schemas + shared deps + background jobs",
+    "status": "in_progress"
+  },
+  {
+    "content": "Phase 2: Full API surface (auth, users, sites, studies, milestones, patients, visits, deviations, queries, ae, monitoring, audit, analytics, dashboard, alerts)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Expanded FHIR R4 layer (5 resources + search + Bundle + CapabilityStatement)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: SDTM DM/AE export + Define-XML",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Seed script with synthetic Ayurveda data + 7 role creds + README",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: All user stories covered",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: End to End Backend Testing using testing_agent_v3",
+    "status": "pending"
+  }
+]

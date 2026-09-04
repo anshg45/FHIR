@@ -1,0 +1,263 @@
+{
+  "resourceType": "CapabilityStatement",
+  "id": "aiia-ctms-fhir-capability",
+  "url": "http://localhost:8001/api/fhir/metadata",
+  "version": "1.0.0",
+  "name": "AIIACTMSFHIRAPI",
+  "title": "AIIA CTMS FHIR R4 Read/Search API",
+  "status": "active",
+  "experimental": true,
+  "date": "2026-09-04T18:19:12.764937+00:00",
+  "publisher": "All India Institute of Ayurveda (AIIA)",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://aiia.gov.in"
+        }
+      ]
+    }
+  ],
+  "description": "FHIR R4 aligned read/search interface over the AIIA Clinical Trial Management System. Designed for ABDM sandbox interoperability. Read-only: no create/update/delete is exposed on the FHIR surface.",
+  "kind": "instance",
+  "software": {
+    "name": "AIIA CTMS Backend",
+    "version": "1.0.0"
+  },
+  "implementation": {
+    "description": "AIIA CTMS FHIR endpoint",
+    "url": "http://localhost:8001/api/fhir"
+  },
+  "fhirVersion": "4.0.1",
+  "format": [
+    "json",
+    "application/fhir+json"
+  ],
+  "rest": [
+    {
+      "mode": "server",
+      "documentation": "Bearer JWT authentication is required on all FHIR endpoints.",
+      "security": {
+        "cors": true,
+        "service": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/restful-security-service",
+                "code": "OAuth",
+                "display": "OAuth"
+              }
+            ]
+          }
+        ],
+        "description": "JWT bearer token issued by /api/auth/login"
+      },
+      "resource": [
+        {
+          "type": "ResearchStudy",
+          "profile": "http://hl7.org/fhir/StructureDefinition/ResearchStudy",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "search-type"
+            }
+          ],
+          "searchParam": [
+            {
+              "name": "_id",
+              "type": "token"
+            },
+            {
+              "name": "identifier",
+              "type": "token"
+            },
+            {
+              "name": "status",
+              "type": "token"
+            },
+            {
+              "name": "title",
+              "type": "string"
+            },
+            {
+              "name": "site",
+              "type": "reference"
+            },
+            {
+              "name": "principalinvestigator",
+              "type": "reference"
+            },
+            {
+              "name": "date",
+              "type": "date"
+            }
+          ]
+        },
+        {
+          "type": "Patient",
+          "profile": "http://hl7.org/fhir/StructureDefinition/Patient",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "search-type"
+            }
+          ],
+          "searchParam": [
+            {
+              "name": "_id",
+              "type": "token"
+            },
+            {
+              "name": "identifier",
+              "type": "token"
+            },
+            {
+              "name": "gender",
+              "type": "token"
+            },
+            {
+              "name": "active",
+              "type": "token"
+            }
+          ]
+        },
+        {
+          "type": "ResearchSubject",
+          "profile": "http://hl7.org/fhir/StructureDefinition/ResearchSubject",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "search-type"
+            }
+          ],
+          "searchParam": [
+            {
+              "name": "_id",
+              "type": "token"
+            },
+            {
+              "name": "identifier",
+              "type": "token"
+            },
+            {
+              "name": "status",
+              "type": "token"
+            },
+            {
+              "name": "study",
+              "type": "reference"
+            },
+            {
+              "name": "individual",
+              "type": "reference"
+            },
+            {
+              "name": "patient",
+              "type": "reference"
+            }
+          ]
+        },
+        {
+          "type": "AdverseEvent",
+          "profile": "http://hl7.org/fhir/StructureDefinition/AdverseEvent",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "search-type"
+            }
+          ],
+          "searchParam": [
+            {
+              "name": "_id",
+              "type": "token"
+            },
+            {
+              "name": "identifier",
+              "type": "token"
+            },
+            {
+              "name": "actuality",
+              "type": "token"
+            },
+            {
+              "name": "seriousness",
+              "type": "token"
+            },
+            {
+              "name": "severity",
+              "type": "token"
+            },
+            {
+              "name": "subject",
+              "type": "reference"
+            },
+            {
+              "name": "study",
+              "type": "reference"
+            },
+            {
+              "name": "date",
+              "type": "date"
+            },
+            {
+              "name": "recorder",
+              "type": "reference"
+            }
+          ]
+        },
+        {
+          "type": "Encounter",
+          "profile": "http://hl7.org/fhir/StructureDefinition/Encounter",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "search-type"
+            }
+          ],
+          "searchParam": [
+            {
+              "name": "_id",
+              "type": "token"
+            },
+            {
+              "name": "identifier",
+              "type": "token"
+            },
+            {
+              "name": "status",
+              "type": "token"
+            },
+            {
+              "name": "subject",
+              "type": "reference"
+            },
+            {
+              "name": "patient",
+              "type": "reference"
+            },
+            {
+              "name": "date",
+              "type": "date"
+            }
+          ]
+        }
+      ],
+      "interaction": [
+        {
+          "code": "search-system"
+        }
+      ]
+    }
+  ]
+}

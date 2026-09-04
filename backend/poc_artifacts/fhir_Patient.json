@@ -1,0 +1,51 @@
+{
+  "resourceType": "Patient",
+  "id": "5bb1abb1-688c-4ae2-a34b-bb33538bf62e",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-09-04T18:19:12.753641+00:00"
+  },
+  "identifier": [
+    {
+      "use": "official",
+      "system": "http://aiia.gov.in/ctms/screening-number",
+      "value": "AIIA-AYU-2026-001-S0001"
+    },
+    {
+      "use": "secondary",
+      "system": "http://aiia.gov.in/ctms/randomization-number",
+      "value": "AIIA-AYU-2026-001-R0001"
+    }
+  ],
+  "active": true,
+  "gender": "male",
+  "_birthDate": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+        "valueCode": "masked"
+      }
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/age-years",
+      "valueInteger": 41
+    },
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/subject-status",
+      "valueString": "enrolled"
+    },
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/consent-obtained",
+      "valueBoolean": true
+    },
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/consent-date",
+      "valueDate": "2026-08-30"
+    }
+  ],
+  "managingOrganization": {
+    "reference": "Organization/38d57199-2d06-4e75-a518-401441778f91"
+  }
+}

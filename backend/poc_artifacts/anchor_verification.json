@@ -1,0 +1,28 @@
+{
+  "anchor_mode": "LOCAL",
+  "anchors_checked": 1,
+  "pending_unanchored_rows": 0,
+  "hash_chain": {
+    "rows_checked": 8,
+    "chain_intact": true,
+    "broken_links": []
+  },
+  "anchors": [
+    {
+      "anchor_id": 1,
+      "chain": "local",
+      "tx_hash": null,
+      "block_number": null,
+      "explorer_url": null,
+      "batch_start_id": 1,
+      "batch_end_id": 8,
+      "expected_row_count": 8,
+      "actual_row_count": 8,
+      "anchored_merkle_root": "0xd0a943c20dea9165669d5e03eaa678fede8bbe57f7ac98af4ff99766bd4bc544",
+      "recomputed_merkle_root": "0xd0a943c20dea9165669d5e03eaa678fede8bbe57f7ac98af4ff99766bd4bc544",
+      "on_chain_merkle_root": null,
+      "verification_status": "matched"
+    }
+  ],
+  "overall_status": "VERIFIED"
+}

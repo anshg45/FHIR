@@ -1,0 +1,53 @@
+{
+  "resourceType": "Encounter",
+  "id": "696bc1d1-7224-486c-8fac-c195900a4cc3",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-09-04T18:19:12.762568+00:00"
+  },
+  "identifier": [
+    {
+      "system": "http://aiia.gov.in/ctms/visit",
+      "value": "9a101439-ca89-4364-a02f-40286ee2daf5:5bb1abb1-688c-4ae2-a34b-bb33538bf62e:V1"
+    }
+  ],
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB",
+    "display": "ambulatory"
+  },
+  "type": [
+    {
+      "text": "Baseline"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/5bb1abb1-688c-4ae2-a34b-bb33538bf62e"
+  },
+  "period": {
+    "start": "2026-09-01"
+  },
+  "extension": [
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/visit-number",
+      "valueInteger": 1
+    },
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/ctms-visit-status",
+      "valueString": "completed"
+    },
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/deviation-flag",
+      "valueBoolean": false
+    },
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/research-study",
+      "valueString": "ResearchStudy/9a101439-ca89-4364-a02f-40286ee2daf5"
+    },
+    {
+      "url": "http://aiia.gov.in/fhir/StructureDefinition/scheduled-date",
+      "valueDate": "2026-09-01"
+    }
+  ]
+}
